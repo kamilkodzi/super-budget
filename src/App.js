@@ -1,5 +1,6 @@
 import React from 'react';
-import { ThemeProvider } from 'styled-components'
+
+import { ThemeProvider } from 'styled-components';
 
 import {
   BrowserRouter as Router,
@@ -11,7 +12,6 @@ import GlobalStyles from './index.css';
 
 import theme from 'utils/theme'
 import { Navigation, Wrapper } from 'components'
-
 
 
 
