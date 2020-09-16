@@ -4,8 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import CustomBackend from './CustomBackend';
 
-const token = process.env.POEDITOR_TOKEN || 'aa719ec8092b8dcb3aeb3bdbf1350a84';
-const id = process.env.POEDITOR_PROJECT_ID || '308099';
+const token = process.env.REACT_APP_POEDITOR_TOKEN;
+const id = process.env.REACT_APP_POEDITOR_PROJECT_ID;
 
 i18n
     // load translation using xhr -> see /public/locales
