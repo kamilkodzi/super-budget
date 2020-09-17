@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import GlobalStyles from './index.css';
 
 import theme from 'utils/theme'
-import { Navigation, Wrapper, LoadingIndicator } from 'components'
+import { Navigation, Wrapper, LoadingIndicator, Button } from 'components'
 
 
 
@@ -29,8 +29,8 @@ function App() {
           { content: 'Budget', to: '/budget' }
         ]} RightElement={(
           <div>
-            <button onClick={() => i18n.changeLanguage('en')}>en</button>
-            <button onClick={() => i18n.changeLanguage('pl')}>pl</button>
+            <Button variant="regular" onClick={() => i18n.changeLanguage('en')}>EN</Button>
+            <Button variant="regular" onClick={() => i18n.changeLanguage('pl')}>PL</Button>
           </div>
         )} />
         <Wrapper>
