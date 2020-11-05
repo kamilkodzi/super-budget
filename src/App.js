@@ -8,7 +8,9 @@ import {
   Route
 } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { connect } from 'react-redux';
 import GlobalStyles from './index.css';
+import { fetchBudget } from 'data/actions/budget.actions'
 
 import theme from 'utils/theme'
 import { Navigation, Wrapper, LoadingIndicator, Button } from 'components'
@@ -16,7 +18,7 @@ import { Navigation, Wrapper, LoadingIndicator, Button } from 'components'
 
 
 
-function App() {
+function App({ budget, fetchBudget }) {
   const { i18n } = useTranslation();
 
   return (
@@ -48,11 +50,19 @@ function App() {
   );
 }
 
+const ConnectedApp = connect(state => {
+  return {
+    budget: state.budget.budget
+  }
+}, {
+  fetchBudget
+})(App)
+
 function RootApp() {
   return (
     <ThemeProvider theme={theme}>
       <React.Suspense fallback={<LoadingIndicator />}>
-        <App />
+        <ConnectedApp />
       </React.Suspense>
     </ThemeProvider>
   )
