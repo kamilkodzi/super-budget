@@ -1,30 +1,25 @@
 import {
-    BUDGET_GET_REQUEST,
-    BUDGET_GET_SUCCESS,
-    BUDGET_GET_FAILURE
+    BUDGET_GET,
+    BUDGET_CATEGORIES_GET,
 } from 'data/constants';
 
-export const fetchBudget = (id) => async (dispatch) => {
-    dispatch({
-        type: BUDGET_GET_REQUEST
-    })
+import API from 'data/fetch';
 
-    try {
-        const response = await fetchBudget(id);
-        const data = response.json()
-        dispatch({
-            type: BUDGET_GET_SUCCESS,
-            payload: data,
-        })
-    } catch (error) {
-        dispatch({
-            type: BUDGET_GET_FAILURE,
-        })
+export const fetchBudget = (id) => {
+    const promise = API.budget.fetchBudget(id);
+
+    return {
+        type: BUDGET_GET,
+        promise,
     }
-    // dispatch akcji BUDGET_GET_SUCCESS + przekazac dane z requestu 
-
 }
 
-const fetchBudgetedCategories = () => {
+export const fetchBudgetedCategories = (id) => {
+    const promise = API.budget.fetchBudgetCategories(id);
+
+    return {
+        type: BUDGET_CATEGORIES_GET,
+        promise,
+    }
 
 }
