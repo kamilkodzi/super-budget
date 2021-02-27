@@ -30,6 +30,8 @@ function BudgetCategoryList({ budgetedCategories, allCategories, budget }) {
                 <CategoryItem
                     key={budgetedCategory.id}
                     name={name}
+                    item={budgetedCategory}
+                    transactions={budget.transactions}
                 />
             )
         }),
