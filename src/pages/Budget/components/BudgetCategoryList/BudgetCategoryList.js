@@ -5,9 +5,13 @@ import { groupBy } from 'lodash';
 
 import { ToggleableList } from 'components';
 import ParentCategory from './ParentCategory';
-import CategoryItem from './CategoryItem'
+import CategoryItem from './CategoryItem';
+import { selectParentCategory } from 'data/actions/budget.actions';
 
-function BudgetCategoryList({ budgetedCategories, allCategories, budget }) {
+function BudgetCategoryList({
+    budgetedCategories, allCategories, budget,
+    selectParentCategory
+}) {
     const budgetedCategoriesByParent = groupBy(
         budgetedCategories,
         item => allCategories.find(category => category.id === item.categoryId).parentCategory.name
@@ -18,7 +22,10 @@ function BudgetCategoryList({ budgetedCategories, allCategories, budget }) {
         Trigger: ({ onClick }) => (
             <ParentCategory
                 name={parentName}
-                onClick={() => onClick(parentName)}
+                onClick={() => {
+                    onClick(parentName);
+                    selectParentCategory(parentName);
+                }}
                 categories={categories}
                 transactions={budget.transactions}
             />
@@ -98,4 +105,6 @@ export default connect(state => ({
     budgetedCategories: state.budget.budgetCategories,
     allCategories: state.common.allCategories,
     budget: state.budget.budget
-}))(BudgetCategoryList)
+}), {
+    selectParentCategory
+})(BudgetCategoryList)
