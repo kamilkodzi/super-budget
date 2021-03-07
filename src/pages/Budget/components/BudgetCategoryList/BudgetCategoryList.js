@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import { connect } from 'react-redux';
 import 'styled-components/macro';
 import { groupBy } from 'lodash';
@@ -12,64 +12,110 @@ function BudgetCategoryList({
     budgetedCategories, allCategories, budget,
     selectParentCategory
 }) {
-    const budgetedCategoriesByParent = groupBy(
-        budgetedCategories,
-        item => allCategories.find(category => category.id === item.categoryId).parentCategory.name
+
+    const handleClickParentCategoryRef = useRef(null);
+
+    const budgetedCategoriesByParent = useMemo(
+        () => groupBy(
+            budgetedCategories,
+            item => allCategories.find(category => category.id === item.categoryId).parentCategory.name
+        ),
+        [budgetedCategories, allCategories]
     );
 
-    const listItems = Object.entries(budgetedCategoriesByParent).map(([parentName, categories]) => ({
-        id: parentName,
-        Trigger: ({ onClick }) => (
-            <ParentCategory
-                name={parentName}
-                onClick={() => {
-                    onClick(parentName);
-                    selectParentCategory(parentName);
-                }}
-                categories={categories}
-                transactions={budget.transactions}
-            />
-        ),
-        children: categories.map(budgetedCategory => {
+    const handleClearParentCategorySelect = useCallback(
+        () => {
+            selectParentCategory();
+            handleClickParentCategoryRef.current()
+        },
+        [selectParentCategory, handleClickParentCategoryRef]
+    )
 
-            const { name } = allCategories.find(category => category.id === budgetedCategory.categoryId);
+    const handleSelectRestParentCategories = useCallback(
+        () => {
+            selectParentCategory(null);
+            handleClickParentCategoryRef.current();
+        },
+        [selectParentCategory, handleClickParentCategoryRef]
+    )
 
-            return (
-                <CategoryItem
-                    key={budgetedCategory.id}
-                    name={name}
-                    item={budgetedCategory}
+    const listItems = useMemo(
+        () => Object.entries(budgetedCategoriesByParent).map(([parentName, categories]) => ({
+            id: parentName,
+            Trigger: ({ onClick }) => (
+                <ParentCategory
+                    name={parentName}
+                    onClick={() => {
+                        onClick(parentName);
+                        selectParentCategory(parentName);
+                    }}
+                    categories={categories}
                     transactions={budget.transactions}
                 />
-            )
-        }),
-    }))
+            ),
+            children: categories.map(budgetedCategory => {
 
-    const totalSpent = budget.transactions
-        .reduce((acc, transaction) => acc + transaction.amount, 0);
+                const { name } = allCategories.find(category => category.id === budgetedCategory.categoryId);
 
-    const restToSpent = budget.totalAmount - totalSpent;
-    const amountTaken = budgetedCategories.reduce((acc, budgetedCategory) => {
-        const categoryTransactions = budget.transactions
-            .filter(transaction => transaction.categoryId === budgetedCategory.id)
-        const categoryExpenses = categoryTransactions
-            .reduce((acc, transaction) => acc + transaction.amount, 0)
+                return (
+                    <CategoryItem
+                        key={budgetedCategory.id}
+                        name={name}
+                        item={budgetedCategory}
+                        transactions={budget.transactions}
+                    />
+                )
+            }),
+        })),
+        [allCategories,
+            budget.transactions,
+            budgetedCategoriesByParent,
+            selectParentCategory]
+    );
 
-        return acc + Math.max(categoryExpenses, budgetedCategory.budget);
-    }, 0);
+    const totalSpent = useMemo(
+        () => budget.transactions
+            .reduce((acc, transaction) => acc + transaction.amount, 0),
+        [budget.transactions]
+    );
 
-    const notBudgetedTransactions = budget.transactions
-        .filter(transaction => {
-            return !budgetedCategories
-                .find(budgetedCategory => budgetedCategory.id === transaction.categoryId)
-        });
+    const restToSpent = useMemo(
+        () => budget.totalAmount - totalSpent,
+        [budget.totalAmount, totalSpent]
+    );
+    const amountTaken = useMemo(
+        () => budgetedCategories.reduce((acc, budgetedCategory) => {
+            const categoryTransactions = budget.transactions
+                .filter(transaction => transaction.categoryId === budgetedCategory.id)
+            const categoryExpenses = categoryTransactions
+                .reduce((acc, transaction) => acc + transaction.amount, 0)
 
-    const notBudgetedExpenses = notBudgetedTransactions
-        .reduce((acc, transaction) => acc + transaction.amount, 0)
+            return acc + Math.max(categoryExpenses, budgetedCategory.budget);
+        }, 0),
+        [budget.transactions, budgetedCategories]
+    );
+
+    const notBudgetedTransactions = useMemo(
+        () => budget.transactions
+            .filter(transaction => {
+                return !budgetedCategories
+                    .find(budgetedCategory => budgetedCategory.id === transaction.categoryId)
+            }),
+        [budget.transactions, budgetedCategories]
+    );
+
+    const notBudgetedExpenses = useMemo(
+        () => notBudgetedTransactions
+            .reduce((acc, transaction) => acc + transaction.amount, 0),
+        [notBudgetedTransactions]
+    )
 
 
 
-    const availableForRestCategiries = budget.totalAmount - amountTaken - notBudgetedExpenses
+    const availableForRestCategiries = useMemo(
+        () => budget.totalAmount - amountTaken - notBudgetedExpenses,
+        [budget.totalAmount, amountTaken, notBudgetedExpenses]
+    )
 
     return (
         <div>
@@ -81,10 +127,12 @@ function BudgetCategoryList({
                 <ParentCategory
                     name={budget.name}
                     amount={restToSpent}
+                    onClick={handleClearParentCategorySelect}
                 />
             </div>
             <ToggleableList
                 items={listItems}
+                clickRef={handleClickParentCategoryRef}
             />
 
             <div
@@ -95,6 +143,7 @@ function BudgetCategoryList({
                 <ParentCategory
                     name='Other categories'
                     amount={availableForRestCategiries}
+                    onClick={handleSelectRestParentCategories}
                 />
             </div>
         </div>
