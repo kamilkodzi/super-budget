@@ -5,11 +5,15 @@ import { useHistory } from 'react-router-dom';
 
 function Modal({ children }) {
     const history = useHistory();
-    console.log({ history })
+    const handleClose = e => {
+        e.stopPropagation();
+        history.goBack()
+    }
+
     return createPortal(
-        <Wrapper>
-            <Content>
-                <CloseIcon onClick={history.goBack}>&times;</CloseIcon>
+        <Wrapper onClick={handleClose}>
+            <Content onClick={e => e.stopPropagation()}>
+                <CloseIcon onClick={handleClose}>&times;</CloseIcon>
                 {children}
             </Content>
         </Wrapper>, document.querySelector('#modal')
