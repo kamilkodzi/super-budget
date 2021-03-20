@@ -12,7 +12,7 @@ import BudgetTransactionList from 'pages/Budget/components/BudgetTransactionList
 import AddTransactionForm from 'pages/Budget/components/AddTransactionForm';
 
 function Budget({
-    commonState, budgetState,
+    commonState, budgetState, allCategories,
     fetchBudget, fetchBudgetedCategories, fetchAllCategories
 }) {
     useEffect(() => {
@@ -52,7 +52,10 @@ function Budget({
             <Switch>
                 <Route path="/budget/transactions/new">
                     <Modal>
-                        <AddTransactionForm></AddTransactionForm>
+                        <AddTransactionForm
+                            categories={allCategories}
+                            groupCategoriesBy="parentCategory.name"
+                        />
                     </Modal>
                 </Route>
             </Switch>
@@ -67,6 +70,7 @@ export default connect(state => {
         budget: state.budget.budget,
         commonState: state.common.loadingState,
         budgetState: state.budget.loadingState,
+        allCategories: state.common.allCategories,
     }
 }, {
     fetchBudget,
