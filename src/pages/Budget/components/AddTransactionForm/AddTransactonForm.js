@@ -7,7 +7,7 @@ import { groupBy } from 'lodash';
 const required = value => (value ? undefined : 'Required');
 
 
-function AddTransactionForm({ categories, groupCategoriesBy }) {
+function AddTransactionForm({ onSubmit = () => { }, categories, groupCategoriesBy }) {
 
     const groupedCategoriesByParentName = groupCategoriesBy
         ? groupBy(categories, groupCategoriesBy)
@@ -17,9 +17,9 @@ function AddTransactionForm({ categories, groupCategoriesBy }) {
         () => groupedCategoriesByParentName
             ? Object.entries(groupedCategoriesByParentName)
                 .map(([parentName, categories]) => (
-                    <optgroup label={parentName}>
+                    <optgroup key={parentName} label={parentName}>
                         {categories.map(category => (
-                            <option value={category.id}>{category.name}</option>
+                            <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </optgroup>
                 ))
@@ -33,7 +33,7 @@ function AddTransactionForm({ categories, groupCategoriesBy }) {
 
     return (
         <Form
-            onSubmit={console.log}
+            onSubmit={onSubmit}
             render={({ handleSubmit, form, submitting, pristine, values }) => (
                 <form onSubmit={handleSubmit}>
                     <Field name="description" validate={required}>
@@ -56,7 +56,7 @@ function AddTransactionForm({ categories, groupCategoriesBy }) {
                         )}
                     </Field>
 
-                    <Field name="category" validate={required}>
+                    <Field name="categoryId" validate={required}>
                         {({ input, meta }) => (
                             <div>
                                 <label>Category</label>

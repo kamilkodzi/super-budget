@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
-import { fetchBudget, fetchBudgetedCategories } from 'data/actions/budget.actions';
+import {
+    fetchBudget, fetchBudgetedCategories, addTransaction,
+} from 'data/actions/budget.actions';
 import { Switch, Route } from "react-router-dom";
 import { fetchAllCategories } from 'data/actions/common.actions';
 import { Grid } from './Budget.css'
@@ -11,9 +13,10 @@ import BudgetCategoryList from 'pages/Budget/components/BudgetCategoryList'
 import BudgetTransactionList from 'pages/Budget/components/BudgetTransactionList';
 import AddTransactionForm from 'pages/Budget/components/AddTransactionForm';
 
+
 function Budget({
-    commonState, budgetState, allCategories,
-    fetchBudget, fetchBudgetedCategories, fetchAllCategories
+    commonState, budgetState, allCategories, budget,
+    fetchBudget, fetchBudgetedCategories, fetchAllCategories, addTransaction,
 }) {
     useEffect(() => {
         fetchBudget(1)
@@ -26,6 +29,13 @@ function Budget({
             && (!!budgetState && Object.keys(budgetState).length === 0),
         [commonState, budgetState]
     );
+
+    const handleSubmitAddTransaction = (values) => {
+        addTransaction({
+            budgetId: budget.id,
+            data: values
+        })
+    }
 
     return (
         <Fragment>
@@ -54,7 +64,8 @@ function Budget({
                     <Modal>
                         <AddTransactionForm
                             categories={allCategories}
-                            groupCategoriesBy="parentCategory.name"
+                            // groupCategoriesBy="parentCategory.name"
+                            onSubmit={handleSubmitAddTransaction}
                         />
                     </Modal>
                 </Route>
@@ -76,4 +87,5 @@ export default connect(state => {
     fetchBudget,
     fetchBudgetedCategories,
     fetchAllCategories,
+    addTransaction,
 })(Budget);
